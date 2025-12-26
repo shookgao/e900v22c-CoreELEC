@@ -1,0 +1,53 @@
+name: Build and Create Release
+
+on:
+  workflow_dispatch:  # 手动触发
+    inputs:
+      version:
+        description: '版本号 (例如: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup build environment
+      run: |
+        # 添加任何必要的环境设置
+        echo "开始构建环境..."
+        
+    - name: Run build script
+      run: |
+        chmod +x build.sh
+        ./build.sh
+        
+    - name: List generated files
+      run: |
+        echo "生成的文件:"
+        find . -type f -name "*.img" -o -name "*.IMG" | xargs ls -lh
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        name: Release ${{ github.event.inputs.version }}
+        draft: false
+        prerelease: false
+        files: |
+          *.img
+          *.IMG
+        body: |
+          ## 版本 ${{ github.event.inputs.version }}
+          
+          构建时间: ${{ github.run_id }}
+          提交: ${{ github.sha }}
+          
+          包含文件:
+          - IMG 镜像文件
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
