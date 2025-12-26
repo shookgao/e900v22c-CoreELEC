@@ -29,7 +29,7 @@ jobs:
     - name: List generated files
       run: |
         echo "生成的文件:"
-        find . -type f -name "*.img" -o -name "*.IMG" | xargs ls -lh
+        find . -type f -name "*.gz" | xargs ls -lh
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
@@ -39,8 +39,8 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          *.img
-          *.IMG
+          *.gz
+          *.sha256
         body: |
           ## 版本 ${{ github.event.inputs.version }}
           
